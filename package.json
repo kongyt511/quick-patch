@@ -35,7 +35,7 @@
 				"quick_patch.scripts_dir": {
 					"type": "string",
 					"default": "Scripts",
-					"description": "补丁根目录"
+					"description": "脚本根目录"
 				}
 			}
 		},
