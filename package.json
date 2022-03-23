@@ -1,8 +1,10 @@
 {
-  "name": "quick-patch",
-	"displayName": "quick_patch",
+  	"name": "quick-patch",
+	"displayName": "Quick Patch",
 	"description": "",
 	"version": "0.0.1",
+	"publisher": "JumpDeveloper",
+	"icon": "icon.png",
 	"engines": {
 		"vscode": "^1.65.0"
 	},
@@ -24,7 +26,7 @@
 				},
 				"quick_patch.dest_path": {
 					"type": "string",
-					"default": "/storage/emulated/0/Android/data/com.bgg.jump/files",
+					"default": "/storage/emulated/0/Android/data/xxxxxx/files",
 					"description": "补丁推送的目的路径"
 				},
 				"quick_patch.patch_dir": {
