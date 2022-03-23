@@ -1,6 +1,5 @@
 import fs = require('fs')
 import path = require('path');
-import { send } from 'process';
 import * as vscode from 'vscode';
 
 class CommandRunner {
@@ -12,7 +11,7 @@ class CommandRunner {
 
 	public async runTerminalCommand(command: string) {
 		if (!this.terminal) {
-			this.terminal = vscode.window.createTerminal('Command Runner');
+			this.terminal = vscode.window.createTerminal('QuickPatch');
 			this.terminal.show();
 			await vscode.commands.executeCommand('workbench.action.terminal.clear');
 		}
@@ -29,26 +28,45 @@ class CommandRunner {
 const commandRunner = new CommandRunner();
 
 async function quickPatchSend(context: vscode.ExtensionContext, uri: vscode.Uri) {
-	const rootPath = context.storageUri?.fsPath as string
+	const ext = vscode.workspace.getConfiguration('quick_patch')
+	const adbPath = ext.get<string>('adb_path') as string
+	const pushPath = ext.get<string>('dest_path') as string
+	const patchDir = ext.get<string>('patch_dir') as string
+	const scriptsDir = ext.get<string>('scripts_dir') as string
+
+	const tmpPath = context.storageUri?.fsPath as string
 	const filePath = uri.fsPath
 	const fileDir = path.parse(filePath).dir
-	const destRootPath = path.join(rootPath, 'debug')
-	const destPath = fileDir.substring(fileDir.indexOf('Scripts')).replace('Scripts', destRootPath)
-	const destFile = path.join(destPath, filePath.split(path.sep).slice(-1)[0])
-	if (!fs.existsSync(destPath)) {
-		fs.mkdirSync(destPath, { recursive: true })
+	const tmpPatchPath = path.join(tmpPath, patchDir)
+	const startPos = fileDir.indexOf(scriptsDir)
+	if (startPos >= 0) {
+		const destPath = fileDir.substring(startPos).replace(scriptsDir, tmpPatchPath)
+		const destFile = path.join(destPath, filePath.split(path.sep).slice(-1)[0])
+		if (!fs.existsSync(destPath)) {
+			fs.mkdirSync(destPath, { recursive: true })
+		}
+		fs.copyFileSync(filePath, destFile)
+		var cmd = adbPath + ' push \"' + tmpPatchPath + '\" ' + pushPath
+		commandRunner.runTerminalCommand(cmd)
+		vscode.window.showInformationMessage('发送文件到设备:', uri.fsPath)
+	} else {
+		vscode.window.showErrorMessage('文件不在脚本文件夹中:', uri.fsPath)
 	}
-	fs.copyFileSync(filePath, destFile)
-	vscode.window.showInformationMessage('发送文件到设备:', uri.fsPath)
 }
 
 async function quickPatchClear(context: vscode.ExtensionContext) {
-	const rootPath = context.storageUri?.fsPath as string
-	const destRootPath = path.join(rootPath, 'debug')
-	// await commandRunner.runTerminalCommand('echo destFile:' + destFile)
-	if (fs.existsSync(destRootPath)) {
-		fs.rmdirSync(destRootPath, { recursive: true })
+	const ext = vscode.workspace.getConfiguration('quick_patch')
+	const adbPath = ext.get<string>('adb_path') as string
+	const pushPath = ext.get<string>('dest_path') as string
+	const patchDir = ext.get<string>('patch_dir') as string
+
+	const tmpPath = context.storageUri?.fsPath as string
+	const tmpPatchPath = path.join(tmpPath, patchDir)
+	if (fs.existsSync(tmpPatchPath)) {
+		fs.rmdirSync(tmpPatchPath, { recursive: true })
 	}
+	var cmd = adbPath + ' shell \"rm -rf ' + pushPath + '/' + patchDir + '\"'
+	commandRunner.runTerminalCommand(cmd)
 	vscode.window.showInformationMessage('清理Patch成功')
 }
 
@@ -66,4 +84,3 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {}
-"c:\\Users\\kongy\\AppData\\Roaming\\Code\\User\\workspaceStorage\\acb01a85a2180aed896b6ba6c69711ee\\undefined_publisher.quick-patch\\debug\\Level"

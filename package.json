@@ -14,6 +14,31 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "QuickPatch",
+			"properties": {
+				"quick_patch.adb_path": {
+					"type": "string",
+					"default": "adb",
+					"description": "adb工具路径"
+				},
+				"quick_patch.dest_path": {
+					"type": "string",
+					"default": "/storage/emulated/0/Android/data/com.bgg.jump/files",
+					"description": "补丁推送的目的路径"
+				},
+				"quick_patch.patch_dir": {
+					"type": "string",
+					"default": "debug",
+					"description": "补丁根目录"
+				},
+				"quick_patch.scripts_dir": {
+					"type": "string",
+					"default": "Scripts",
+					"description": "补丁根目录"
+				}
+			}
+		},
 		"commands": [
 			{
 				"command": "quick_patch_send",
