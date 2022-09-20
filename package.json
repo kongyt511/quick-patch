@@ -2,7 +2,7 @@
   	"name": "quick-patch",
 	"displayName": "Quick Patch",
 	"description": "",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "JumpDeveloper",
 	"icon": "icon.png",
 	"engines": {
@@ -22,12 +22,22 @@
 				"quick_patch.adb_path": {
 					"type": "string",
 					"default": "adb",
-					"description": "adb工具路径"
+					"description": "adb工具路径(Android)"
 				},
-				"quick_patch.dest_path": {
+				"quick_patch.ifuse_path": {
+					"type": "string",
+					"default": "ifuse",
+					"description": "isuse工具路径(iOS)"
+				},
+				"quick_patch.dest_path_android": {
 					"type": "string",
 					"default": "/storage/emulated/0/Android/data/xxxxxx/files",
-					"description": "补丁推送的目的路径"
+					"description": "补丁推送的目的路径(Android)"
+				},
+				"quick_patch.bundle_id": {
+					"type": "string",
+					"default": "xxxxxx",
+					"description": "App的Bundle Id(IOS)"	
 				},
 				"quick_patch.patch_dir": {
 					"type": "string",
@@ -43,23 +53,41 @@
 		},
 		"commands": [
 			{
-				"command": "quick_patch_send",
-				"title": "Quick Patch"
+				"command": "quick_patch_send_android",
+				"title": "Quick Patch (Android)"
 			},
 			{
-				"command": "quick_patch_clear",
-				"title": "Clear Patch"
+				"command": "quick_patch_clear_android",
+				"title": "Clear Patch (Android)"
+			},
+			{
+				"command": "quick_patch_send_ios",
+				"title": "Quick Patch (iOS)"
+			},
+			{
+				"command": "quick_patch_clear_ios",
+				"title": "Clear Patch (iOS)"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "quick_patch_send",
+					"command": "quick_patch_send_android",
 					"group": "z_commands",
 					"when": "!explorerResourceIsFolder"
 				},
 				{
-					"command": "quick_patch_clear",
+					"command": "quick_patch_clear_android",
+					"group": "z_commands",
+					"when": "filesExplorerFocus"
+				},
+				{
+					"command": "quick_patch_send_ios",
+					"group": "z_commands",
+					"when": "!explorerResourceIsFolder"
+				},
+				{
+					"command": "quick_patch_clear_ios",
 					"group": "z_commands",
 					"when": "filesExplorerFocus"
 				}
